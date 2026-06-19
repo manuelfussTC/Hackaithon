@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "repository": "git@github.com:manuelfussTC/Hackaithon.git",
+  "runtime": {
+    "node": ">=20.9",
+    "packageManager": "npm"
+  },
+  "security": {
+    "localSecretFile": ".env.local",
+    "trackedEnvironmentTemplate": ".env.example",
+    "forbiddenTrackedPatterns": [
+      "**/.env",
+      "**/.env.local",
+      "**/.env.*.local"
+    ]
+  },
+  "projects": [
+    {
+      "id": "pdp-growth-kit",
+      "directory": "pdp-growth-kit",
+      "localUrl": "http://localhost:3001",
+      "install": "npm install",
+      "configure": "cp .env.example .env.local",
+      "start": "npm run dev -- --webpack --port 3001",
+      "verify": [
+        "npm run typecheck",
+        "npm run lint",
+        "npm test",
+        "npm run build",
+        "npm run test:e2e"
+      ],
+      "environment": [
+        {
+          "name": "OPENAI_API_KEY",
+          "required": true,
+          "secret": true
+        },
+        {
+          "name": "OPENAI_MODEL",
+          "required": false,
+          "secret": false,
+          "default": "gpt-5.4-mini"
+        },
+        {
+          "name": "OPENAI_IMAGE_MODEL",
+          "required": false,
+          "secret": false,
+          "default": "gpt-image-2"
+        }
+      ]
+    },
+    {
+      "id": "competitor-x-ray",
+      "directory": "competitor-x-ray",
+      "localUrl": "http://localhost:3002",
+      "install": "npm install",
+      "configure": "cp .env.example .env.local",
+      "start": "npm run dev -- --webpack --port 3002",
+      "verify": [
+        "npm run typecheck",
+        "npm run lint",
+        "npm test",
+        "npm run build",
+        "npm run test:e2e"
+      ],
+      "environment": [
+        {
+          "name": "OPENAI_API_KEY",
+          "required": true,
+          "secret": true
+        },
+        {
+          "name": "OPENAI_MODEL",
+          "required": false,
+          "secret": false,
+          "default": "gpt-5.4-mini"
+        },
+        {
+          "name": "TAVILY_API_KEY",
+          "required": false,
+          "secret": true
+        }
+      ]
+    }
+  ]
+}

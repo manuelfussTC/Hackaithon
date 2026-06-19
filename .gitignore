@@ -1,0 +1,20 @@
+# Dependencies and build output
+**/node_modules/
+**/.next/
+**/out/
+**/coverage/
+**/playwright-report/
+**/test-results/
+**/*.tsbuildinfo
+**/*.log
+
+# Local secrets: examples remain publishable
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local tooling and operating-system files
+.DS_Store
+**/.DS_Store
+.idea/
+.vscode/
