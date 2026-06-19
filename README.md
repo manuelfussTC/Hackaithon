@@ -61,6 +61,7 @@ cp .env.example .env.local
 OPENAI_API_KEY=DEIN_OPENAI_KEY
 OPENAI_MODEL=gpt-5.4-mini
 OPENAI_IMAGE_MODEL=gpt-image-2
+OPENAI_IMAGE_QUALITY=medium
 ~~~
 
 Dann starten:
@@ -103,6 +104,7 @@ API-Aufrufe sind nicht Teil dieses Repositories und können beim jeweiligen Anbi
 
 - Textanalysen und Generierungen nutzen standardmäßig gpt-5.4-mini.
 - Bilder werden ausschließlich nach einem bewussten Klick mit gpt-image-2 erzeugt.
+- Die Bildqualität steht für kürzere Wartezeiten standardmäßig auf medium; low ist schneller, high langsamer und detailreicher.
 - Mehrfachgenerierung erzeugt mehrere Bildaufrufe.
 - Tavily Advanced Extract verbraucht Tavily-Credits.
 

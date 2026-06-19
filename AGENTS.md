@@ -38,6 +38,7 @@ Use .env.example as the contract. Local values belong in .env.local.
 - Both projects require OPENAI_API_KEY.
 - OPENAI_MODEL defaults to gpt-5.4-mini.
 - pdp-growth-kit supports OPENAI_IMAGE_MODEL, default gpt-image-2.
+- pdp-growth-kit supports OPENAI_IMAGE_QUALITY with low, medium, or high; default medium.
 - competitor-x-ray optionally supports TAVILY_API_KEY.
 
 Do not assume optional keys are present. Competitor X-Ray must retain its local extraction fallback when Tavily is unavailable.

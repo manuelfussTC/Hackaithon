@@ -62,6 +62,11 @@ export async function regenerateSection(section: SectionKey, analysis: ProductAn
 }
 
 const sizes = { square: "1024x1024", portrait: "1024x1536", landscape: "1536x1024" } as const;
+type ImageQuality = "low" | "medium" | "high";
+
+export function resolveImageQuality(value = process.env.OPENAI_IMAGE_QUALITY): ImageQuality {
+  return value === "low" || value === "high" ? value : "medium";
+}
 
 type ImageProviderError = { code?: string; status?: number };
 
@@ -80,6 +85,7 @@ export function imageProviderError(error: unknown) {
 export async function generateImage(prompt: string, format: keyof typeof sizes, productImageUrl: string, useReference: boolean) {
   const api = client();
   const model = process.env.OPENAI_IMAGE_MODEL || "gpt-image-2";
+  const quality = resolveImageQuality();
   try {
     let result;
     if (useReference && productImageUrl) {
@@ -89,12 +95,12 @@ export async function generateImage(prompt: string, format: keyof typeof sizes, 
         model,
         prompt: fidelityPrompt,
         size: sizes[format],
-        quality: "high",
+        quality,
         output_format: "png",
         image: await toFile(source.data, "exact-product-reference", { type: source.contentType.split(";")[0] }),
       });
     } else {
-      result = await api.images.generate({ model, prompt, size: sizes[format], quality: "medium", output_format: "png" });
+      result = await api.images.generate({ model, prompt, size: sizes[format], quality, output_format: "png" });
     }
     const base64 = result.data?.[0]?.b64_json;
     if (!base64) throw new Error("Image response is empty");

@@ -46,6 +46,13 @@
           "required": false,
           "secret": false,
           "default": "gpt-image-2"
+        },
+        {
+          "name": "OPENAI_IMAGE_QUALITY",
+          "required": false,
+          "secret": false,
+          "default": "medium",
+          "allowedValues": ["low", "medium", "high"]
         }
       ]
     },

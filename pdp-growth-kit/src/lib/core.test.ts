@@ -3,7 +3,7 @@ import { growthKitMarkdown } from "./export";
 import { parsePdp } from "./pdp-parser";
 import { growthKitSchema, type GrowthKit, type ProductAnalysis } from "./schemas";
 import { isPrivateAddress } from "./safe-fetch";
-import { imageProviderError } from "./openai";
+import { imageProviderError, resolveImageQuality } from "./openai";
 
 const analysis: ProductAnalysis = {
   sourceUrl: "https://shop.example/product", productName: "Cloud Runner", brand: "Aero",
@@ -59,6 +59,12 @@ describe("Growth Kit contracts", () => {
 });
 
 describe("image provider errors", () => {
+  it("uses medium quality by default and accepts an explicit speed setting", () => {
+    expect(resolveImageQuality(undefined)).toBe("medium");
+    expect(resolveImageQuality("low")).toBe("low");
+    expect(resolveImageQuality("unsupported")).toBe("medium");
+  });
+
   it("explains unsupported model parameters", () => {
     const error = imageProviderError({ status: 400, code: "invalid_input_fidelity_model" });
     expect(error.code).toBe("IMAGE_MODEL_CONFIGURATION");

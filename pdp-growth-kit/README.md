@@ -31,6 +31,7 @@ cp .env.example .env.local
 OPENAI_API_KEY=DEIN_OPENAI_KEY
 OPENAI_MODEL=gpt-5.4-mini
 OPENAI_IMAGE_MODEL=gpt-image-2
+OPENAI_IMAGE_QUALITY=medium
 ~~~
 
 Echte Keys niemals in .env.example oder Quellcode eintragen.
@@ -58,6 +59,8 @@ Die vollständige gemeinsame Installations-, Sicherheits- und Troubleshooting-An
 
 Bilder werden niemals automatisch erzeugt. Jeder Klick auf „Bild generieren“ löst einen separaten Modellaufruf und mögliche Kosten aus. Wenn erreichbar, lädt der Server das PDP-Produktbild und übergibt es als High-Fidelity-Referenz. Ist die Referenz nicht abrufbar, warnt die Oberfläche und verlangt eine bewusste reine Prompt-Generierung.
 
+Die Ausgabequalität steht standardmäßig auf medium, um die Wartezeit im Hackathon zu reduzieren. Für maximale Geschwindigkeit kann OPENAI_IMAGE_QUALITY=low gesetzt werden; high liefert mehr Detail, dauert aber deutlich länger. Nach einer Änderung muss der Development-Server neu gestartet werden.
+
 Bilddaten bleiben ausschließlich im Arbeitsspeicher der Browsersitzung. Sie überleben keinen Reload und sollten vorher heruntergeladen werden. Texte und Prompts bleiben versioniert unter growth-kit:v1 in localStorage.
 
 ## Konfiguration
@@ -67,6 +70,7 @@ Bilddaten bleiben ausschließlich im Arbeitsspeicher der Browsersitzung. Sie üb
 | OPENAI_API_KEY | ja | keiner | Serverseitige Analyse und Generierung |
 | OPENAI_MODEL | nein | gpt-5.4-mini | Konfigurierbares Textmodell |
 | OPENAI_IMAGE_MODEL | nein | gpt-image-2 | Konfigurierbares Bildmodell |
+| OPENAI_IMAGE_QUALITY | nein | medium | low, medium oder high; steuert Geschwindigkeit und Detailgrad |
 
 ## Unterstützte PDPs
 
