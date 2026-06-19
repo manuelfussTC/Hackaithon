@@ -63,6 +63,20 @@ export async function regenerateSection(section: SectionKey, analysis: ProductAn
 
 const sizes = { square: "1024x1024", portrait: "1024x1536", landscape: "1536x1024" } as const;
 
+type ImageProviderError = { code?: string; status?: number };
+
+export function imageProviderError(error: unknown) {
+  const provider = error as ImageProviderError;
+  if (provider.code === "invalid_input_fidelity_model") {
+    return new AppError("IMAGE_MODEL_CONFIGURATION", "Das konfigurierte Bildmodell unterstützt einen verwendeten Bildparameter nicht.", 502);
+  }
+  if (provider.status === 401) return new AppError("IMAGE_AUTH_ERROR", "Der OpenAI API-Key wurde für die Bildgenerierung nicht akzeptiert.", 502);
+  if (provider.status === 403) return new AppError("IMAGE_ACCESS_ERROR", "Das OpenAI-Projekt hat keinen Zugriff auf das konfigurierte Bildmodell.", 502);
+  if (provider.status === 429) return new AppError("IMAGE_RATE_LIMIT", "Das OpenAI-Limit für Bildgenerierung ist erreicht. Bitte prüfe Guthaben und Rate Limits.", 429);
+  if (provider.status === 400) return new AppError("IMAGE_REQUEST_REJECTED", "OpenAI hat den Bildauftrag abgelehnt. Bitte prüfe Prompt, Referenzbild und Modellkonfiguration.", 422);
+  return new AppError("IMAGE_ERROR", "Das Bild konnte wegen eines Fehlers beim Bildmodell nicht erzeugt werden.", 502);
+}
+
 export async function generateImage(prompt: string, format: keyof typeof sizes, productImageUrl: string, useReference: boolean) {
   const api = client();
   const model = process.env.OPENAI_IMAGE_MODEL || "gpt-image-2";
@@ -77,7 +91,6 @@ export async function generateImage(prompt: string, format: keyof typeof sizes, 
         size: sizes[format],
         quality: "high",
         output_format: "png",
-        input_fidelity: "high",
         image: await toFile(source.data, "exact-product-reference", { type: source.contentType.split(";")[0] }),
       });
     } else {
@@ -89,6 +102,6 @@ export async function generateImage(prompt: string, format: keyof typeof sizes, 
   } catch (error) {
     if (error instanceof AppError) throw error;
     console.error(error);
-    throw new AppError("IMAGE_ERROR", "Das Bild konnte nicht erzeugt werden.", 502);
+    throw imageProviderError(error);
   }
 }

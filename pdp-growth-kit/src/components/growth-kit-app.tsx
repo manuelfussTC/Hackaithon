@@ -30,10 +30,17 @@ const fieldLabels: Record<string, string> = {
 
 type ApiError = { code?: string; message?: string };
 
+class ApiRequestError extends Error {
+  constructor(message: string, public code?: string) { super(message); }
+}
+
 async function api<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
   const data = await response.json();
-  if (!response.ok) throw new Error((data as ApiError).message || "Die Anfrage ist fehlgeschlagen.");
+  if (!response.ok) {
+    const apiError = data as ApiError;
+    throw new ApiRequestError(apiError.message || "Die Anfrage ist fehlgeschlagen.", apiError.code);
+  }
   return data as T;
 }
 
@@ -138,7 +145,10 @@ export function GrowthKitApp() {
     } catch (e) {
       const message = (e as Error).message;
       setImageErrors((current) => ({ ...current, [item.id]: message }));
-      if (useReference && analysis.imageUrl) setImageFallback((current) => [...new Set([...current, item.id])]);
+      const referenceErrors = new Set(["DNS_ERROR", "FETCH_TIMEOUT", "FETCH_FAILED", "TOO_MANY_REDIRECTS", "INVALID_REDIRECT", "PDP_BLOCKED", "UNSUPPORTED_CONTENT", "CONTENT_TOO_LARGE"]);
+      if (useReference && analysis.imageUrl && e instanceof ApiRequestError && referenceErrors.has(e.code || "")) {
+        setImageFallback((current) => [...new Set([...current, item.id])]);
+      }
       return false;
     } finally { setImageBusy((current) => current.filter((id) => id !== item.id)); }
   }

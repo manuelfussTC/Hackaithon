@@ -3,6 +3,7 @@ import { growthKitMarkdown } from "./export";
 import { parsePdp } from "./pdp-parser";
 import { growthKitSchema, type GrowthKit, type ProductAnalysis } from "./schemas";
 import { isPrivateAddress } from "./safe-fetch";
+import { imageProviderError } from "./openai";
 
 const analysis: ProductAnalysis = {
   sourceUrl: "https://shop.example/product", productName: "Cloud Runner", brand: "Aero",
@@ -54,5 +55,19 @@ describe("Growth Kit contracts", () => {
     const markdown = growthKitMarkdown(analysis, kit);
     expect(markdown).toContain("# Growth Kit: Cloud Runner");
     expect(markdown).toContain("## Landingpage Hero");
+  });
+});
+
+describe("image provider errors", () => {
+  it("explains unsupported model parameters", () => {
+    const error = imageProviderError({ status: 400, code: "invalid_input_fidelity_model" });
+    expect(error.code).toBe("IMAGE_MODEL_CONFIGURATION");
+    expect(error.message).toContain("Bildmodell");
+  });
+
+  it("distinguishes rate limits from generic image failures", () => {
+    const error = imageProviderError({ status: 429 });
+    expect(error.code).toBe("IMAGE_RATE_LIMIT");
+    expect(error.status).toBe(429);
   });
 });
