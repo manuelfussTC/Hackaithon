@@ -175,6 +175,9 @@ npm run dev -- --webpack --port 3010
 ## Sicherheit und Datenschutz
 
 - .env-Dateien werden rekursiv ignoriert; nur .env.example darf versioniert werden.
+- `.vercelignore` und `.dockerignore` verhindern zusätzlich, dass lokale Secrets, Builds oder Logs in Deployment-Kontexte gelangen.
+- Eine Root- und je eine Projekt-`.htaccess` sperren unter Apache Env-, Git-, Quellcode-, Schlüssel- und Konfigurationsdateien. Next.js und Vercel verwenden stattdessen die eingebauten Security-Header.
+- Alle API-Routen prüfen Browser-Origin und Requestgröße und besitzen ein lokales Rate Limit; API-Antworten werden nicht gecacht.
 - OpenAI- und Tavily-Aufrufe erfolgen ausschließlich serverseitig.
 - Roh-HTML, API-Keys und Produktbild-Referenzdaten werden nicht in localStorage geschrieben.
 - Generierte Bilder und hochgeladene Screenshots sind nicht dauerhaft gespeichert.
@@ -196,6 +199,8 @@ Weitere Regeln stehen in [SECURITY.md](./SECURITY.md).
 Beide Projekte verwenden Next.js App Router, TypeScript, Zod, OpenAI Responses API, Vitest und Playwright. Das Hackathon-CI nutzt Schwarz, warmes Off-White, Neon-Grün, Archivo/Archivo Black und JetBrains Mono.
 
 Die lokale Nutzung ist der vorgesehene Standard. Für ein öffentliches Deployment müssen mindestens Authentifizierung, Rate Limiting, serverseitige Kostenlimits, Monitoring und ein Datenschutzkonzept ergänzt werden.
+
+Vercel-Nutzer legen echte API-Keys ausschließlich als **Sensitive Environment Variables** in den Projekt-Einstellungen an. Die `.htaccess` ist dort wirkungslos und kein Ersatz für die Next.js-Sicherheitskonfiguration.
 
 ## Lizenz und Credits
 

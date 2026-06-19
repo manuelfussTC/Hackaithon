@@ -1,0 +1,29 @@
+# Defense in depth for Apache 2.4 deployments or reverse proxies.
+# Next.js and Vercel do not evaluate this file; application headers live in next.config.ts.
+Options -Indexes
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule "(^|/)\.(?!well-known(?:/|$))" - [F,L,NC]
+  RewriteRule "(^|/)(src|node_modules|coverage|test-results|playwright-report)(/|$)" - [F,L,NC]
+</IfModule>
+
+<IfModule mod_authz_core.c>
+  <FilesMatch "(?i)^(\.env($|\.)|\.git|\.htaccess|package(-lock)?\.json|tsconfig\.json|next\.config\.(js|mjs|ts)|.*\.(ts|tsx|map|lock|log|pem|key|crt))$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  <FilesMatch "(?i)^(\.env($|\.)|\.git|\.htaccess|package(-lock)?\.json|tsconfig\.json|next\.config\.(js|mjs|ts)|.*\.(ts|tsx|map|lock|log|pem|key|crt))$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+</IfModule>

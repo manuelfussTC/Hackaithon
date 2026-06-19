@@ -5,6 +5,7 @@ import { enrichPdpData } from "./pdp-enrichment";
 import { isPrivateAddress } from "./safe-fetch";
 import { extractWithTavily } from "./tavily";
 import { overallScores, reportSchema, type PdpProfile, type XRayReport } from "./schemas";
+import { assertApiRequest } from "./request-security";
 
 const profile = (side: "own" | "competitor"): PdpProfile => ({
   sourceUrl: `https://${side}.example/product`, productName: `${side} Product`, brand: `${side} Brand`, category: "Laufschuh", price: "99 EUR", imageUrl: "https://example.com/product.jpg", description: "Leichter Laufschuh", audience: "Freizeitläufer", valueProposition: "Leicht und komfortabel", language: "de", signals: ["Lieferinformation vorhanden"], extraction: { local: true, tavily: true, degraded: false, warnings: [] },
@@ -25,6 +26,23 @@ describe("network safety", () => {
     expect(isPrivateAddress("127.0.0.1")).toBe(true);
     expect(isPrivateAddress("192.168.1.2")).toBe(true);
     expect(isPrivateAddress("8.8.8.8")).toBe(false);
+  });
+});
+
+describe("API request guard", () => {
+  it("rejects cross-origin requests", () => {
+    const request = new Request("https://app.example/api/compare", { headers: { origin: "https://evil.example" } });
+    expect(() => assertApiRequest(request, { maxBytes: 1024 })).toThrowError(/Cross-Origin/);
+  });
+
+  it("rejects oversized request bodies before parsing", () => {
+    const request = new Request("https://app.example/api/compare", { headers: { "content-length": "2048" } });
+    expect(() => assertApiRequest(request, { maxBytes: 1024 })).toThrowError(/zu groß/);
+  });
+
+  it("requires a declared request size", () => {
+    const request = new Request("https://app.example/api/compare");
+    expect(() => assertApiRequest(request, { maxBytes: 1024 })).toThrowError(/angegeben/);
   });
 });
 

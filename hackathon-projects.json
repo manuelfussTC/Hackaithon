@@ -12,6 +12,15 @@
       "**/.env",
       "**/.env.local",
       "**/.env.*.local"
+    ],
+    "deploymentIgnoreFiles": [".vercelignore", ".dockerignore"],
+    "apacheDefenseInDepth": ".htaccess",
+    "runtimeControls": [
+      "content-security-policy",
+      "same-origin-api-requests",
+      "request-size-limits",
+      "per-instance-rate-limits",
+      "no-store-api-responses"
     ]
   },
   "projects": [

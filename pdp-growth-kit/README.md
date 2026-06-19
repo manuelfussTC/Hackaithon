@@ -111,4 +111,6 @@ npx playwright install chromium
 
 Private IPs, Loopback, lokale Hosts, gefährliche Redirects, zu große Antworten und ungeeignete Bildformate werden blockiert. OpenAI-Key, Roh-HTML und Bildreferenzdaten gelangen nicht in localStorage.
 
-Die Anwendung besitzt keine Accounts, Datenbank oder eingebaute Rate Limits. Ein öffentlicher Betrieb benötigt Authentifizierung, Rate Limiting, Kostenlimits und ein Datenschutzkonzept.
+API-Routen akzeptieren keine fremden Browser-Origins, begrenzen Requestgrößen und Aufrufe und senden `Cache-Control: no-store`. Security-Header werden in `next.config.ts` gesetzt. `.htaccess` schützt sensible Dateien zusätzlich unter Apache; Vercel und der Next.js-Server werten sie nicht aus. `.vercelignore` und `.dockerignore` verhindern die Aufnahme lokaler Env-Dateien in Deployment-Kontexte.
+
+Die Anwendung besitzt keine Accounts oder Datenbank. Das eingebaute Rate Limit gilt nur pro laufender Node.js-Instanz; ein öffentlicher Betrieb benötigt zusätzlich Authentifizierung, persistentes verteiltes Rate Limiting, Kostenlimits und ein Datenschutzkonzept.

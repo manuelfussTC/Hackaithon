@@ -6,6 +6,7 @@ import { enrichPdpData } from "@/lib/pdp-enrichment";
 import { extractWithTavily, requirePageSource, type TavilyPage } from "@/lib/tavily";
 import { buildProfiles, type CombinedSource } from "@/lib/openai";
 import { errorResponse } from "@/lib/errors";
+import { assertApiRequest } from "@/lib/request-security";
 
 export const runtime = "nodejs";
 export const maxDuration = 90;
@@ -28,6 +29,7 @@ function parseLocal(result: PromiseSettledResult<Awaited<ReturnType<typeof fetch
 
 export async function POST(request: Request) {
   try {
+    assertApiRequest(request, { maxBytes: 32_768, requestsPerMinute: 30 });
     const { ownUrl, competitorUrl } = extractRequestSchema.parse(await request.json());
     await Promise.all([assertPublicUrl(ownUrl), assertPublicUrl(competitorUrl)]);
     const [localResults, tavily] = await Promise.all([

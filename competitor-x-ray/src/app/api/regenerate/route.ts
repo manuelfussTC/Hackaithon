@@ -3,12 +3,14 @@ import { pdpProfileSchema, regenerateRequestSchema, reportSchema, sectionKeySche
 import { screenshotsFromForm } from "@/lib/screenshots";
 import { regenerateReportSection } from "@/lib/openai";
 import { errorResponse } from "@/lib/errors";
+import { assertApiRequest } from "@/lib/request-security";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
 export async function POST(request: Request) {
   try {
+    assertApiRequest(request, { maxBytes: 6_291_456, requestsPerMinute: 20 });
     const form = await request.formData();
     const input = regenerateRequestSchema.parse({
       section: sectionKeySchema.parse(String(form.get("section"))),

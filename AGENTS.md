@@ -50,6 +50,8 @@ Do not assume optional keys are present. Competitor X-Ray must retain its local 
 - Do not claim actual conversion, revenue, or competitor performance from visible PDP evidence.
 - Do not persist screenshot binaries, generated image data, raw HTML, or secrets in localStorage.
 - Public deployment requires authentication, rate limiting, and spend controls.
+- Preserve security headers, same-origin request checks, body-size limits, no-store API caching, and deployment ignore files.
+- `.htaccess` is defense in depth for Apache only; never treat it as protection for Next.js or Vercel.
 
 ## Documentation
 

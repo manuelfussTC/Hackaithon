@@ -4,6 +4,7 @@ import { parsePdp } from "./pdp-parser";
 import { growthKitSchema, type GrowthKit, type ProductAnalysis } from "./schemas";
 import { isPrivateAddress } from "./safe-fetch";
 import { imageProviderError, resolveImageQuality } from "./openai";
+import { assertApiRequest } from "./request-security";
 
 const analysis: ProductAnalysis = {
   sourceUrl: "https://shop.example/product", productName: "Cloud Runner", brand: "Aero",
@@ -27,6 +28,23 @@ describe("network safety", () => {
     expect(isPrivateAddress("192.168.1.2")).toBe(true);
     expect(isPrivateAddress("::1")).toBe(true);
     expect(isPrivateAddress("8.8.8.8")).toBe(false);
+  });
+});
+
+describe("API request guard", () => {
+  it("rejects cross-origin requests", () => {
+    const request = new Request("https://app.example/api/generate", { headers: { origin: "https://evil.example" } });
+    expect(() => assertApiRequest(request, { maxBytes: 1024 })).toThrowError(/Cross-Origin/);
+  });
+
+  it("rejects oversized request bodies before parsing", () => {
+    const request = new Request("https://app.example/api/generate", { headers: { "content-length": "2048" } });
+    expect(() => assertApiRequest(request, { maxBytes: 1024 })).toThrowError(/zu groß/);
+  });
+
+  it("requires a declared request size", () => {
+    const request = new Request("https://app.example/api/generate");
+    expect(() => assertApiRequest(request, { maxBytes: 1024 })).toThrowError(/angegeben/);
   });
 });
 
